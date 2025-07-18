@@ -2,6 +2,7 @@ import pandas as pd
 import json
 import boto3
 import requests
+from io import BytesIO
 
 from config import *
 
@@ -25,7 +26,10 @@ class SurgeStatus():
             Bucket=self.fill_bucket,
             Key=self.fill_key
         )
-        self.fill_df = pd.read_parquet(obj['Body'].read())
+        buffer = BytesIO()
+        buffer.write(obj['Body'].read())
+        buffer.seek(0)
+        self.fill_df = pd.read_parquet(buffer)
         return self.fill_df
 
     def get_config(self):
